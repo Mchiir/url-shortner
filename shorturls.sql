@@ -45,9 +45,7 @@ CREATE TABLE `links` (
 --
 
 LOCK TABLES `links` WRITE;
-/*!40000 ALTER TABLE `links` DISABLE KEYS */;
-INSERT INTO `links` VALUES ('https://google.com','6kh88660',1,1),('https://google.com','psnhe2wn',0,2),('https://google.com','gpek9yt6',2,3),('https://google.com','581yv2y2',2,4),('https://google.com','vdy0ze0j',2,5),('https://facebook.com','aat2ip81',2,6),('https://youtube.com','rylbngdw',1,7),('https://youtube.com','uxe9bzhb',0,8),('https://code.jquery.com/jquery-3.7.1.min.js','0fjpjsia',3,9),('https://code.jquery.com/jquery-3.7.1.min.js','y9r68xr7',0,10),('https://code.jquery.com/jquery-3.7.1.min.js','itt05i4x',1,11),('https://code.jquery.com/jquery-3.7.1.min.js','4127tzbu',0,12),('https://google.com','s493b8qp',0,13),('https://google.com','028x5jmc',1,14),('https://twitter.com','6mrbrkyt',1,15),('https://agasobanuyefilms.com/uploads/movie/FIGHER%20A.mp4','0dlv0glb',4,16);
-/*!40000 ALTER TABLE `links` ENABLE KEYS */;
+
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
