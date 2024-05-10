@@ -7,7 +7,8 @@ const debug = require('debug');
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static('public'));
+app.use(express.static(__dirname));
+// app.use(express.static('public'));
 
 const { database } = config;
 const conn = mysql2.createConnection({
@@ -26,7 +27,7 @@ conn.connect((err) => {
 });
 
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + "/index.html");
+    res.sendFile(__dirname + "/INDEX.html");
 });
 
 app.post("/api/create-short-url", (req, res) => {
