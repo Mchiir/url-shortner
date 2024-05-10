@@ -1,13 +1,9 @@
 module.exports = {
-    port: 4000,
+    port: 3000,
     database:{
-        host:'localhost',
-        user:'root',
-        password: '',
-        database:'shorturls'
-    },
-    jwtConfig:{
-        jwtSecret:'keep_it_secret',
-        jwtExpiration:'2h'
+        host:'****',
+        user:'****',
+        password: '****',
+        database:'****'
     }
 }
