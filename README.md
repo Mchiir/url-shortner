@@ -20,4 +20,6 @@ localhost:<port-number>/
 Test the working of the repo codes.
 start the repo if usefull.
 
+if not, reach up on me mchrispin14@gmail.com , and then I can sort it
+
 Happy coding!
