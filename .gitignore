@@ -3,3 +3,8 @@ query
 shorten.js
 urlShorten.css
 urlShorten.html
+config.js
+
+.env
+backup
+node_modules
