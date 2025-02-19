@@ -8,16 +8,6 @@ body{
     font-family: "Raleway", sans-serif;
 }
 
-.header{
-    width: 100%;
-    height: 50px;
-    line-height: 50px;
-    text-align: center;
-    background: #111;
-    color: #eee;
-    font-weight: 600;
-}
-
 .form{
     padding: 50px 20px;
     background: #d2e9f7;
@@ -79,3 +69,10 @@ body{
 .list table tbody tr:nth-child(odd){
     background: #eee;
 }
+<<<<<<< HEAD
+
+#list_urls {
+    width: 100%;
+}
+=======
+>>>>>>> 216c0121c800a41b0fdcc0ab0145fe4687efddbf
