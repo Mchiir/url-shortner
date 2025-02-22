@@ -2,7 +2,6 @@ import dotenv from 'dotenv'
 dotenv.config()
 import express from 'express'
 import { createConnection } from 'mysql2'
-import debug from 'debug'
 
 const app = express()
 app.use(express.json())
@@ -29,6 +28,8 @@ conn.connect((err) => {
 })
 
 app.post("/api/create-short-url", (req, res) => {
+    console.log("Reached create short url API")
+
     let uniqueID = Math.random().toString(36).substring(2, 10)
     let sql = 'INSERT INTO links (longurl, shorturlid) VALUES (?, ?)'
     const values = [req.body.longurl, uniqueID]
