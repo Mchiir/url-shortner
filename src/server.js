@@ -3,15 +3,9 @@ dotenv.config()
 import express from 'express'
 import { createConnection } from 'mysql2'
 import debug from 'debug'
-import path from 'path'
-import { fileURLToPath } from 'url'
 
 const app = express()
 app.use(express.json())
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-app.use(express.static(path.join(__dirname, 'public')))
 
 const database = process.env.DB
 const PORT = process.env.PORT || 3000
@@ -32,10 +26,6 @@ conn.connect((err) => {
         return
     }
     console.log(`Connected to ${database} mysql database!`)
-})
-
-app.get('/', (req, res) => {
-    res.sendFile("index.html")
 })
 
 app.post("/api/create-short-url", (req, res) => {
