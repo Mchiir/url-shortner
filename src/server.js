@@ -7,9 +7,7 @@ import { Links, Users, sequelize } from './models/mod.js'
 const app = express()
 app.use(express.json())
 
-
 const PORT = process.env.PORT || 3000
-const URL = `http://localhost:${PORT}`
 
 
 // Define __dirname manually for ES module
