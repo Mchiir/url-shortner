@@ -2,3 +2,5 @@
 backup
 node_modules
 pnpn
+hello.txt
+*.yaml

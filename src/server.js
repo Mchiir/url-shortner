@@ -1,7 +1,8 @@
-import dotenv from 'dotenv'
-dotenv.config()
+import 'dotenv/config'
 import express from 'express'
 import { createConnection } from 'mysql2'
+import path from 'path'
+import { fileURLToPath } from 'url'
 
 const app = express()
 app.use(express.json())
@@ -11,6 +12,7 @@ const PORT = process.env.PORT || 3000
 const DB_USER = process.env.DB_USER
 const DB_HOST = process.env.DB_HOST
 const DB_PASSWORD = process.env.DB_PASSWORD
+const URL = `http://localhost:${PORT}`
 
 const conn = createConnection({
     host: DB_HOST,
@@ -21,31 +23,63 @@ const conn = createConnection({
 
 conn.connect((err) => {
     if (err) {
-        console.log(`Error connecting to database ${database} mysql DB: ${err}`)
+        // console.log(`Error connecting to database ${database} mysql DB: ${err}`)
+        process.exit(1)
         return
     }
-    console.log(`Connected to ${database} mysql database!`)
+    // console.log(`Connected to ${database} mysql database!`)
 })
 
-app.post("/api/create-short-url", (req, res) => {
-    console.log("Reached create short url API")
+// Define __dirname manually for ES module
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
-    let uniqueID = Math.random().toString(36).substring(2, 10)
-    let sql = 'INSERT INTO links (longurl, shorturlid) VALUES (?, ?)'
-    const values = [req.body.longurl, uniqueID]
+app.use(express.static(path.join(__dirname, 'public')))
 
-    conn.query(sql, values, (error, result) => {
-        if (error) {
-            console.error('Error creating short URL:', error)
-            return res.status(500).json({ error: "Error creating short URL" })
-        } else {
-            res.status(200).json({ status: "OK", shorturlid: uniqueID })
-        }
-    })
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'))
 })
 
-app.get('/api/get-all-short-urls', (req, res) => {
+app.post("/create-short-url", (req, res) => {
+    // console.log("Reached create short url API")
+
+    function generateUniqueID() {
+        return Math.random().toString(36).substring(2, 10)
+    }
+
+    function insertURL() {
+        const uniqueID = generateUniqueID()
+        let sqlCheck = "SELECT COUNT(*) AS count FROM links where shorturlid = ?"
+
+        conn.query(sqlCheck, [uniqueID], (error, result) => {
+            if (error) {
+                console.error("Database error:", error)
+                return res.status(500).json({ message:error.message })
+            }
+
+            if (result[0].count > 0) {
+                // If the ID already exists, generate a new one
+                insertURL()
+            } else {
+                let sqlInsert = 'INSERT INTO links (longurl, shorturlid) VALUES (?, ?)'
+                conn.query(sqlInsert, [req.body.longurl, uniqueID], (error, insertResult) => {
+                    if (error) {
+                        console.error("Error inserting short URL:", error)
+                        return res.status(500).json({ error: "Error creating short URL" })
+                    }
+
+                    res.status(200).json({ status: "OK", shorturlid: uniqueID })
+                })
+            }
+        })
+    }
+
+    insertURL()
+})
+
+app.get('/get-all-short-urls', (req, res) => {
     let sql = "SELECT * FROM links"
+
     conn.query(sql, (error, result) => {
         if (error) {
             console.error('Error fetching short URLs:', error)
@@ -59,44 +93,58 @@ app.get('/api/get-all-short-urls', (req, res) => {
 })
 
 
-app.get('/:shorturlid', (req, res) => {
-    let shorturlid = req.params.shorturlid
-    let sql = "SELECT * FROM links WHERE shorturlid = ? LIMIT 1"
-    let values = [shorturlid]
+app.get('/short.url/:shorturlid', async (req, res) => {
+    try {
+        const { shorturlid } = req.params
 
-    return new Promise((resolve, reject) => {
-        conn.query(sql, values, (error, result) => {
-            if (error) {
-                console.error('Error fetching short URL:', error)
-                reject({ status: 500, error: "Something went wrong" })
-            }
+        let sql = "SELECT * FROM links WHERE shorturlid = ? LIMIT 1"
+        let values = [shorturlid]
+        // console.log("values:", values)
 
-            if (result.length === 0) {
-                reject({ status: 404, error: "Short URL not found" })
-            }
-
-            let updateSql = "UPDATE links SET count = count + 1 WHERE id = ?"
-            console.log(result)
-            conn.query(updateSql, [result[0].id], (updateError, updateResult) => {
-                if (updateError) {
-                    console.error('Error updating short URL count:', updateError)
-                    reject({ status: 500, error: "Something went wrong" })
+        const [result] = await new Promise((resolve, reject) => {
+            conn.query(sql, values, (error, result) => {
+                if (error) {
+                    console.error('Error fetching short URL:', error)
+                    return reject({ status: 500, error: "Something went wrong" })
                 }
 
-                resolve({ status: 200, longurl: result[0].longurl })
+                if (result.length === 0) {
+                    return reject({ status: 404, error: "Short URL not found" })
+                }
+                resolve(result)
             })
         })
-    })
-        .then((data) => {
-            res.redirect(data.longurl)
+
+        // console.log("QueryResult:", result)
+
+        const { id, longurl } = result
+        // console.log("ID:", id)
+
+        let updateSql = "UPDATE links SET count = count + 1 WHERE id = ?"
+        await new Promise((resolve, reject) => {
+            conn.query(updateSql, [id], (updateError, updateResult) => {
+                if (updateError) {
+                    console.error('Error updating short URL count:', updateError)
+                    return reject({ status: 500, error: "Something went wrong" })
+                }
+
+                resolve(updateResult)
+            })
         })
-        .catch((error) => {
-            res.status(error.status).json({ error: error.error })
-        })
+
+        if (!longurl) {
+            return res.status(500).json({ error: "Long URL not found" })
+        }
+
+        res.json({ longurl })
+    } catch (error) {
+        res.status(error.status || 500).json({ error: error.error || "Internal Server Error" })
+    }
 })
 
 
-
 app.listen(PORT, () => {
+    if(app.get('env') == 'development'){
     console.log(`Server is running on port ${PORT}`)
+    }
 })

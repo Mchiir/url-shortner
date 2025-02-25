@@ -110,10 +110,14 @@
     </div>
 
     <script>
-         const host = "http://localhost:4040/";
-        document.querySelector("#create-short-url").addEventListener('click', () => {
+        const host = "http://localhost:4040/"
+        const isProduction = window.location.hostname !== 'localhost'
+        
+        document.addEventListener('DOMContentLoaded', ()=>{
+
+            document.querySelector("#create-short-url").addEventListener('click', () => {
             let longurl = document.querySelector("#longurl").value.trim();
-            console.log(longurl)
+            // console.log(longurl)
             if (longurl.length === 0) {
                 alert("Enter valid URL");
                 return;
@@ -121,7 +125,8 @@
                 alert("Enter valid link");
                 return;
             }
-            fetch(host +"api/create-short-url", {
+
+            const result = fetch(host +"create-short-url", {
                 method: 'POST',
                 body: JSON.stringify({
                     longurl: longurl
@@ -129,25 +134,34 @@
                 headers: {
                     "Content-Type": "application/json; charset=UTF-8"
                 }
-            })
-            .then((response) => {
-                console.log(response);
-                return response.json();
+            });
+
+            // console.log("Returned result:", result)
+
+            result.then((Response) => {
+                // console.log(Response);
+                return Response.json();
             })
             .then((data) => {
+
+                // console.log("Returned data:", data)
+
                 if (data.status.toLowerCase() === "ok") {
-                    document.getElementById("short-url").innerText = `${host}${data.shorturlid}`;
-                    document.getElementById("short-url").href = `${host}${data.shorturlid}`;
+        
+                    const shorturl = `${host}short.url/${data.shorturlid}`
+
+                    document.getElementById("short-url").innerText = shorturl;
+                    document.getElementById("short-url").href = shorturl;
                     
                     // ✅ Append the new row dynamically instead of overwriting
                     let newRow = `
                         <tr>
                             <td><a href="${longurl}" target="_blank">${longurl}</a></td>
-                            <td><a href="${shortUrl}" target="_blank">${shortUrl}</a></td>
+                            <td><a href="${shorturl}" target="_blank" class="short-url">${shorturl}</a></td>
                             <td>0</td>
                         </tr>
                     `;
-                    document.getElementById("list_urls").innerHTML += newRow;
+                    document.querySelector("#list_urls tbody").insertAdjacentHTML("beforeend", newRow)
                 } else {
                     Swal.fire("Error", "Failed to shorten URL", "error");
                 }
@@ -157,6 +171,39 @@
                 console.error("Fetch error:", error);
             });
         });   
+
+            document.querySelector('#list_urls tbody').addEventListener('click', (e)=>{
+                if(e.target.classList.contains("short-url")){
+                    e.preventDefault()
+                    let shorturl = e.target.href
+
+                    if(shorturl){
+                        fetch(shorturl)
+                        .then(response => response.json())
+                        .then(data => {
+                            window.open(data.longurl, '_blank'); // Open in a new tab
+                        })
+                        .catch(error => console.error("Error:", error));
+                    }   
+                }
+            })
+
+
+            document.querySelector('#short-url').addEventListener('click', (e)=>{
+                e.preventDefault()
+                let shorturl = e.target.href
+
+                if(shorturl){
+                    fetch(shorturl)
+                    .then(response => response.json())
+                    .then(data => {
+                        window.open(data.longurl, '_blank'); // Open in a new tab
+                    })
+                    .catch(error => console.error("Error:", error));
+                }
+            })
+
+        })    
     </script>
 </body>
 </html>
