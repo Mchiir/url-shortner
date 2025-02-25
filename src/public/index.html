@@ -110,9 +110,13 @@
     </div>
 
     <script>
-        const host = "http://localhost:4040/"
         const isProduction = window.location.hostname !== 'localhost'
-        
+        if(isProduction){
+            // host in prod mode
+        }else{
+            const host = "http://localhost:4040/"
+        }
+
         document.addEventListener('DOMContentLoaded', ()=>{
 
             document.querySelector("#create-short-url").addEventListener('click', () => {
@@ -147,7 +151,7 @@
                 // console.log("Returned data:", data)
 
                 if (data.status.toLowerCase() === "ok") {
-        
+
                     const shorturl = `${host}short.url/${data.shorturlid}`
 
                     document.getElementById("short-url").innerText = shorturl;
