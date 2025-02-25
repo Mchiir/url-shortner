@@ -3,8 +3,12 @@ import express from 'express'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { Links, Users, sequelize } from './models/mod.js'
+import helmet from 'helmet'
+import cors from 'cors'
 
 const app = express()
+app.use(helmet())
+app.use(cors({ origin: ['http://localhost:4030', 'https://url-shortner-sx5f.onrender.com']}))
 app.use(express.json())
 
 const PORT = process.env.PORT || 3000
