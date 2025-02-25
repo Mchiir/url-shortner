@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Url shortener</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+   
+   <style>
+        main div form span input{
+            padding: 5px;
+            outline: 0;
+            border: 0;
+            border-bottom: 1px solid black;
+            border-radius: 5px;
+        }
+        main div form div span button{
+            padding: 5px;
+            outline: 0;
+            border: 0;
+            border-radius: 3px;
+        }
+        main div form div span button[type='submit']{
+            background-color: green;
+            color: white;
+        }
+        main div form div span button[type='reset']{
+            background-color: #cdcaca;
+            color: black;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            
+        }
+        
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            width: 100%;
+            height: 50px;
+            line-height: 50px;
+            text-align: center;
+            background: #111;
+            color: #eee;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .header button {
+            background-color: #fff;
+            color: black;
+            border: none;
+            padding: 8px 16px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .header button:hover {
+            background-color: #e7e7e7;
+        }
+        .header button{
+            position: relative;
+            left: 10cm;
+        }
+    </style>
+</head>
+<body>
+    <section>
+        <div class="header">
+            Get Short URL
+        </div>
+
+    <div class="form">
+            <div class="form-element">
+                <label for="longurl">Enter link: </label>
+                <input type="url" id="longurl" placeholder="http://site.com" maxlength="100">
+            </div>
+            <div class="form-element">
+                <button id="create-short-url">Create Short URL</button>
+            </div>
+            <div class="result">
+                <a href="#" id="short-url"></a>
+            </div>
+    </div>
+    <div class="list">
+        <h2 id="head">Shorten Links</h2>
+        <table id="list_urls">
+            <thead>
+                <tr>
+                    <th>LongURL</th>
+                    <th>ShortURL</th>
+                    <th>Count</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Table rows will be added dynamically -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const isProduction = window.location.hostname !== 'localhost'
+        if(isProduction){
+            // host in prod mode
+        }else{
+            const host = "http://localhost:4040/"
+        }
+
+        document.addEventListener('DOMContentLoaded', ()=>{
+
+            document.querySelector("#create-short-url").addEventListener('click', () => {
+            let longurl = document.querySelector("#longurl").value.trim();
+            // console.log(longurl)
+            if (longurl.length === 0) {
+                alert("Enter valid URL");
+                return;
+            } else if (!(longurl.startsWith("http://") || longurl.startsWith("https://"))) {
+                alert("Enter valid link");
+                return;
+            }
+
+            const result = fetch(host +"create-short-url", {
+                method: 'POST',
+                body: JSON.stringify({
+                    longurl: longurl
+                }),
+                headers: {
+                    "Content-Type": "application/json; charset=UTF-8"
+                }
+            });
+
+            // console.log("Returned result:", result)
+
+            result.then((Response) => {
+                // console.log(Response);
+                return Response.json();
+            })
+            .then((data) => {
+
+                // console.log("Returned data:", data)
+
+                if (data.status.toLowerCase() === "ok") {
+
+                    const shorturl = `${host}short.url/${data.shorturlid}`
+
+                    document.getElementById("short-url").innerText = shorturl;
+                    document.getElementById("short-url").href = shorturl;
+                    
+                    // ✅ Append the new row dynamically instead of overwriting
+                    let newRow = `
+                        <tr>
+                            <td><a href="${longurl}" target="_blank">${longurl}</a></td>
+                            <td><a href="${shorturl}" target="_blank" class="short-url">${shorturl}</a></td>
+                            <td>0</td>
+                        </tr>
+                    `;
+                    document.querySelector("#list_urls tbody").insertAdjacentHTML("beforeend", newRow)
+                } else {
+                    Swal.fire("Error", "Failed to shorten URL", "error");
+                }
+            })
+            .catch(error => {
+                Swal.fire("Error", "Something went wrong", "error");
+                console.error("Fetch error:", error);
+            });
+        });   
+
+            document.querySelector('#list_urls tbody').addEventListener('click', (e)=>{
+                if(e.target.classList.contains("short-url")){
+                    e.preventDefault()
+                    let shorturl = e.target.href
+
+                    if(shorturl){
+                        fetch(shorturl)
+                        .then(response => response.json())
+                        .then(data => {
+                            window.open(data.longurl, '_blank'); // Open in a new tab
+                        })
+                        .catch(error => console.error("Error:", error));
+                    }   
+                }
+            })
+
+
+            document.querySelector('#short-url').addEventListener('click', (e)=>{
+                e.preventDefault()
+                let shorturl = e.target.href
+
+                if(shorturl){
+                    fetch(shorturl)
+                    .then(response => response.json())
+                    .then(data => {
+                        window.open(data.longurl, '_blank'); // Open in a new tab
+                    })
+                    .catch(error => console.error("Error:", error));
+                }
+            })
+
+        })    
+    </script>
+</body>
+</html>
