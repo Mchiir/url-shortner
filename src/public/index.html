@@ -111,10 +111,12 @@
 
     <script>
         const isProduction = window.location.hostname !== 'localhost'
+        let host;
         if(isProduction){
             // host in prod mode
+            host = "http://localhost:4030/"
         }else{
-            const host = "http://localhost:4040/"
+            host = "http://localhost:4030/"
         }
 
         document.addEventListener('DOMContentLoaded', ()=>{
