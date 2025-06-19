@@ -22,18 +22,15 @@ const { validateUserdata } = require('./validation');
 
 const PORT = env.parsed.PORT || 3000;
 const app = express();
-<<<<<<< HEAD
 
 // Middleware
 app.use(express.json());
 app.use(express.static(__dirname));
 app.use(express.static('public'));
-=======
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname));
 // app.use(express.static('public'));
->>>>>>> 216c0121c800a41b0fdcc0ab0145fe4687efddbf
 
 // JWT Middleware to check for token validity
 const jwtMiddleware = (req, res, next) => {
@@ -72,11 +69,8 @@ conn.connect(err => {
 
 // Routes
 app.get('/', (req, res) => {
-<<<<<<< HEAD
   res.sendFile(__dirname + "/INDEX.html");
-=======
     res.sendFile(__dirname + "/INDEX.html");
->>>>>>> 216c0121c800a41b0fdcc0ab0145fe4687efddbf
 });
 
 app.post("/api/create-short-url", jwtMiddleware, (req, res) => {
@@ -157,7 +151,6 @@ app.post('/Register', (req, res) => {
 
   const { firstname, lastname, password } = value;
 
-<<<<<<< HEAD
   bcrypt.hash(password, 10, (hashError, hashedPassword) => {
     if (hashError) {
       console.error("Error hashing password:", hashError);
@@ -181,8 +174,6 @@ app.post('/Register', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
-=======
 app.listen(config.port, () => {
     console.log(`Server is running on port ${config.port}`);
 });
->>>>>>> 216c0121c800a41b0fdcc0ab0145fe4687efddbf
