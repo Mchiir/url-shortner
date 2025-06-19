@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Url shortener</title>
     <link rel="stylesheet" type="text/css" href="INDEX.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
    
    <style>
         main div form span input{
@@ -76,7 +75,6 @@
     </style>
 </head>
 <body>
-<<<<<<< HEAD
     <section>
         <div class="header">
             <h1>Just Get Short URL</h1>
@@ -98,68 +96,6 @@
             <h2 id="head">Shortened Links</h2>
             <table id="list_urls">
                 <thead>
-=======
-    <div class="header">
-        Create URL Shortener
-    </div>
-
-    <div class="form">
-            <div class="form-element">
-                <label for="longurl">Enter link: </label>
-                <input type="url" id="longurl" placeholder="http://site.com" maxlength="100">
-            </div>
-            <div class="form-element">
-                <button id="create-short-url">Create Short URL</button>
-            </div>
-            <div class="result">
-                <a href="#" id="short-url"></a>
-            </div>
-    </div>
-    <div class="list">
-        <h2 id="head">Shorten Links</h2>
-        <table id="list_urls">
-            <thead>
-                <tr>
-                    <th>LongURL</th>
-                    <th>ShortURL</th>
-                    <th>Count</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Table rows will be added dynamically -->
-            </tbody>
-        </table>
-    </div>
-
-    <script type="text/javascript">
-         const host = "http://localhost:4000/";
-        document.querySelector("#create-short-url").addEventListener('click', () => {
-            let longurl = document.querySelector("#longurl").value.trim();
-            if (longurl.length === 0) {
-                alert("Enter valid URL");
-                return;
-            } else if (!(longurl.startsWith("http://") || longurl.startsWith("https://"))) {
-                alert("Enter valid link");
-                return;
-            }
-            fetch(host +"api/create-short-url", {
-                method: 'POST',
-                body: JSON.stringify({
-                    longurl: longurl
-                }),
-                headers: {
-                    "Content-Type": "application/json; charset=UTF-8"
-                }
-            })
-            .then((response) => {
-                return response.json();
-            })
-            .then((data) => {
-                if (data.status.toLowerCase() === "ok") {
-                    document.getElementById("short-url").innerText = `${host}${data.shorturlid}`;
-                    document.getElementById("short-url").href = `${host}${data.shorturlid}`;
-                    let html = `
->>>>>>> 216c0121c800a41b0fdcc0ab0145fe4687efddbf
                     <tr>
                         <th>LongURL</th>
                         <th>ShortURL</th>
@@ -174,6 +110,7 @@
         </div>
     </section>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script type="text/javascript" src="./app.js">
     </script>
 </body>
